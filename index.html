@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Shirshika! 🎉</title>
+    
+    <!-- Google Fonts for Modern Typography & Elegance -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti Library via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* === Global Reset & Setup === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Prevent scrolling for SPA feel */
+            background-color: #000;
+        }
+
+        /* === Screen Management === */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+            transform: scale(0.95);
+        }
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+            transform: scale(1);
+        }
+
+        /* === Screen 1: The Hacker / Security Check === */
+        #screen1 {
+            background-color: #0b0c10;
+            color: #45f3ff;
+            font-family: 'Courier Prime', monospace;
+        }
+        .terminal-box {
+            background: #1f2833;
+            border-radius: 8px;
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            border: 2px solid #45f3ff;
+            box-shadow: 0 0 20px rgba(69, 243, 255, 0.2);
+            text-align: left;
+        }
+        .terminal-box h2 {
+            margin-top: 0;
+            color: #ff4757;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
+        }
+        .terminal-box p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 80px; /* Reserve height to avoid layout shift */
+        }
+        .cursor {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .s1-btns {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .s1-btns.fade-in {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .hacker-btn {
+            background: transparent;
+            border: 2px solid #45f3ff;
+            color: #45f3ff;
+            padding: 12px 24px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .hacker-btn:hover {
+            background: #45f3ff;
+            color: #0b0c10;
+            box-shadow: 0 0 15px #45f3ff;
+        }
+        .hacker-btn-danger {
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+        .hacker-btn-danger:hover {
+            background: #ff4757;
+            color: #0b0c10;
+            box-shadow: 0 0 15px #ff4757;
+        }
+
+        /* === Screen 2: The Naughty Button === */
+        #screen2 {
+            background: radial-gradient(circle at center, #ffd194, #70e1f5);
+        }
+        .s2-content {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .s2-content h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #2f3542;
+        }
+        .s2-content p {
+            font-size: 1.2rem;
+            color: #57606f;
+            margin-bottom: 30px;
+        }
+        #naughty-btn {
+            padding: 15px 35px;
+            font-size: 18px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255,71,87,0.4);
+            transition: transform 0.1s ease, background 0.3s;
+        }
+        .defeated-btn {
+            background: linear-gradient(135deg, #2ed573, #7bed9f) !important;
+            box-shadow: 0 8px 20px rgba(46, 213, 115, 0.4) !important;
+            margin-top: 10px;
+        }
+        .defeated-btn:hover {
+            transform: scale(1.05) !important;
+        }
+
+        /* === Screen 3: The Grand Celebration === */
+        #screen3 {
+            /* Animated pastel gradient */
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            color: #2c3e50;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        .glass-card::-webkit-scrollbar { display: none; }
+        
+        .glass-card h1 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #ff4757;
+            text-shadow: 0 2px 5px rgba(255,255,255,0.8);
+            font-weight: 800;
+        }
+        .glass-card p.msg {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #2f3640;
+        }
+        .signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem !important;
+            text-align: right;
+            color: #e84118;
+            margin-bottom: 30px;
+            padding-right: 20px;
+        }
+
+        /* === The Interactive Cake === */
+        .cake-container {
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .cake {
+            position: relative;
+            width: 140px;
+            height: 110px;
+        }
+        .layer {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 8px;
+            box-shadow: inset 0 -5px 15px rgba(0,0,0,0.1);
+        }
+        .layer-bottom {
+            width: 140px;
+            height: 60px;
+            background: #ffb8b8; /* Pink sponge */
+            bottom: 0;
+            border: 3px solid #fff;
+        }
+        .layer-top {
+            width: 100px;
+            height: 50px;
+            background: #ffeaa7; /* Vanilla */
+            bottom: 60px;
+            border: 3px solid #fff;
+        }
+        .icing {
+            width: 146px;
+            height: 15px;
+            background: #fff;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 53px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .icing-top {
+            width: 106px;
+            height: 15px;
+            background: #fff;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 103px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .candle {
+            width: 12px;
+            height: 35px;
+            background: repeating-linear-gradient(
+                -45deg,
+                #fff,
+                #fff 4px,
+                #ff4757 4px,
+                #ff4757 8px
+            );
+            position: absolute;
+            bottom: 115px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 3px;
+            z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .flame {
+            width: 16px;
+            height: 22px;
+            background: #ff9d00;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: -26px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px #ff9d00, 0 0 30px #ff0000;
+            animation: flicker 0.4s infinite alternate;
+        }
+        .flame.out {
+            opacity: 0;
+            transform: translateX(-50%) scale(0);
+            transition: all 0.5s ease;
+        }
+        .smoke {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: #888;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .smoke.out {
+            animation: rise 2.5s ease-out forwards;
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+            100% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+        }
+        @keyframes rise {
+            0% { opacity: 0.8; top: -25px; transform: translateX(-50%) scale(1); }
+            100% { opacity: 0; top: -100px; transform: translateX(-200%) scale(2.5); }
+        }
+        
+        .hint {
+            font-size: 0.95rem;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #d63031;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ==============================================
+         SCREEN 1: THE SECURITY PRANK
+    =============================================== -->
+    <div id="screen1" class="screen active">
+        <div class="terminal-box">
+            <h2>SECURITY ALERT! 🚨</h2>
+            <p><span id="typer-text"></span><span class="cursor">_</span></p>
+            <div class="s1-btns" id="s1-btns">
+                <button onclick="transitionTo(2)" class="hacker-btn">Yes, that's me!</button>
+                <button onclick="denyAccess()" class="hacker-btn hacker-btn-danger">No, I'm an angel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 2: THE NAUGHTY BUTTON
+    =============================================== -->
+    <div id="screen2" class="screen">
+        <div class="s2-content">
+            <h2>Okay, identity verified! 🕵️‍♀️</h2>
+            <p>To get your birthday gift, just click the button below. Simple, right?</p>
+            <!-- Button Container keeps flex layout center logic intact -->
+            <div style="min-height: 80px;">
+                <button id="naughty-btn">Click Here for the Surprise 🎁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 3: THE GRAND CELEBRATION
+    =============================================== -->
+    <div id="screen3" class="screen">
+        <div class="glass-card">
+            <h1>HAPPY BIRTHDAY, SHIRSHIKA! 🎉🎂</h1>
+            <p class="msg">
+                Okay, jokes apart! Happy Birthday to the most annoying yet amazing person I know. 
+                Despite all your drama, you have a heart of gold. I wish you a day that is as fantastic 
+                and bright as your smile, and a year filled with endless joy, massive success, and 
+                beautiful memories. May all your dreams come true, and may you never change 
+                (well, maybe just a little less drama!). Keep shining always!
+            </p>
+            <p class="signature">With love and best wishes,<br>Gunakar</p>
+            
+            <div class="cake-container" onclick="blowCandle()" title="Blow the candle!">
+                <div class="cake">
+                    <div class="candle">
+                        <div class="flame" id="flame"></div>
+                        <div class="smoke" id="smoke"></div>
+                    </div>
+                    <div class="icing-top"></div>
+                    <div class="layer layer-top"></div>
+                    <div class="icing"></div>
+                    <div class="layer layer-bottom"></div>
+                </div>
+                <p class="hint" id="hint-text">Click the cake to blow out the candle! 💨</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         JAVASCRIPT LOGIC
+    =============================================== -->
+    <script>
+        /* --- Screen 1 Typewriter Logic --- */
+        const textToType = "High levels of Drama, Craziness, and Attitude detected... Are you the one they call Shirshika?";
+        let charIndex = 0;
+        
+        function typeWriter() {
+            if (charIndex < textToType.length) {
+                document.getElementById("typer-text").innerHTML += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 40); // typing speed
+            } else {
+                // Show buttons when done
+                document.getElementById("s1-btns").classList.add("fade-in");
+            }
+        }
+        window.onload = () => {
+            setTimeout(typeWriter, 500); // slight delay before starting to type
+        };
+
+        function denyAccess() {
+            alert("Liar! 😂 Only Shirshika would say that. Access Denied (Just kidding, click Yes!).");
+        }
+
+        /* --- Screen Transition Manager --- */
+        function transitionTo(screenNum) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById('screen' + screenNum).classList.add('active');
+
+            if(screenNum === 3) {
+                // Fire massive confetti as soon as Screen 3 is opened
+                setTimeout(grandConfettiExplosion, 400);
+            }
+        }
+
+        /* --- Screen 2 Naughty Button Logic --- */
+        let dodgeAttempts = 0;
+        const naughtyBtn = document.getElementById('naughty-btn');
+
+        function teaseButton(e) {
+            if (dodgeAttempts >= 4) return;
+            
+            // Prevent accidental click during touch events
+            if(e.type === 'touchstart') e.preventDefault();
+            
+            dodgeAttempts++;
+            
+            if (dodgeAttempts >= 4) {
+                // Reset styling, let it stay exactly where CSS intends
+                naughtyBtn.style.position = 'relative';
+                naughtyBtn.style.left = 'auto';
+                naughtyBtn.style.top = 'auto';
+                naughtyBtn.style.transform = 'scale(1)';
+                naughtyBtn.className = 'defeated-btn'; // Adds nice green UI
+                naughtyBtn.innerText = "Okay fine, I pity you. Click me now!";
+                naughtyBtn.onclick = () => transitionTo(3);
+                return;
+            }
+            
+            // Generate Random Coordinates ensuring the button remains fully in the viewport
+            const btnWidth = naughtyBtn.offsetWidth;
+            const btnHeight = naughtyBtn.offsetHeight;
+            const maxX = window.innerWidth - btnWidth - 40;
+            const maxY = window.innerHeight - btnHeight - 40;
+            
+            // Ensure minimum padding from edges
+            const randomX = Math.max(20, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(20, Math.floor(Math.random() * maxY));
+            
+            naughtyBtn.style.position = 'fixed'; // Temporarily fixed to viewport so it flies around freely
+            naughtyBtn.style.left = randomX + 'px';
+            naughtyBtn.style.top = randomY + 'px';
+        }
+
+        // Catch both Mouse Events (Desktop) and Touch (Mobile)
+        naughtyBtn.addEventListener('mouseenter', teaseButton);
+        naughtyBtn.addEventListener('touchstart', teaseButton, { passive: false });
+
+
+        /* --- Screen 3 Confetti & Interactive Cake Logic --- */
+        function grandConfettiExplosion() {
+            var duration = 4000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 8,
+                    angle: 60,
+                    spread: 65,
+                    origin: { x: 0 },
+                    colors: ['#ff9a9e', '#fecfef', '#a1c4fd', '#ff4757', '#ffd194']
+                });
+                confetti({
+                    particleCount: 8,
+                    angle: 120,
+                    spread: 65,
+                    origin: { x: 1 },
+                    colors: ['#ff9a9e', '#fecfef', '#a1c4fd', '#ff4757', '#ffd194']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // Blow out the candle functionality
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            const smoke = document.getElementById('smoke');
+            const hint = document.getElementById('hint-text');
+            
+            if (!flame.classList.contains('out')) {
+                // Kill flame, trigger smoke 
+                flame.classList.add('out');
+                smoke.classList.add('out');
+                hint.innerText = "Yay! Happy Birthday! 🥳🎉";
+                hint.style.color = "#00b894"; // Green success text
+                
+                // One huge blast of confetti from the center!
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        colors: ['#FFC107', '#FF9800', '#FF5722', '#F44336', '#ff4757'],
+                        disableForReducedMotion: true
+                    });
+                }, 100);
+            }
+        }
+    </script>
+</body>
+</html>
